@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 /* class to demonstrate use of Calendar events list API */
-public class CalendarQuickstart {
+public class CalendarManager {
     /**
      * Application name.
      */
@@ -55,18 +55,12 @@ public class CalendarQuickstart {
     private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT)
             throws IOException {
         // Load client secrets.
-        InputStream in = CalendarQuickstart.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
+        InputStream in = Main.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
         if (in == null) {
             throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
         }
         GoogleClientSecrets clientSecrets =
                 GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
-
-        // DEBUGGING - Check all arguments
-        System.out.println("HTTP_TRANSPORT: " + HTTP_TRANSPORT.toString());
-        System.out.println("JSON_FACTORY: " + JSON_FACTORY.toString());
-        System.out.println("clientSecrets: " + clientSecrets);
-        System.out.println("SCOPES: " + SCOPES.toString());
 
         // Build flow and trigger user authorization request.
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
@@ -80,7 +74,7 @@ public class CalendarQuickstart {
         return credential;
     }
 
-    public static void main(String... args) throws IOException, GeneralSecurityException {
+    public static void example() throws IOException, GeneralSecurityException {
         // Build a new authorized API client service.
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         Calendar service =
