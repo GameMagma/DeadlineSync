@@ -6,8 +6,7 @@ import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
-import java.time.LocalDate;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -39,8 +38,6 @@ public class Window {
     /**
      * Open the window, go to canvas, and sign in with the user's credentials
      */
-
-
     public void setup(HashMap<String, String> schoolCredentials) {
         driver.get("https://nwmissouri.instructure.com/");
 
@@ -64,10 +61,9 @@ public class Window {
     /**
      * This method of getting assignments uses method 1, which is the more efficient option.
      * This will go to the agenda in the calendar section, go through each day, and put each assignment in
-     * a hashmap (Probably. I'm not sure yet, but it'll be a file or something that includes the due date of each
-     * assignment, their name, and their class).
+     * a list.
      */
-    public void getAssignments() {
+    public List<AgendaDay> getAssignments() {
         // Switch to the calendar
         WebElement calendarButton = driver.findElement(By.id("global_nav_calendar_link"));
         wait.until(d -> calendarButton.isDisplayed());
@@ -88,8 +84,18 @@ public class Window {
         WebElement agendaWrapper = calendarApp.findElement(By.className("agenda-wrapper"));
         wait.until(d -> agendaWrapper.isDisplayed());
 
-        List<WebElement> assignmentLists = agendaWrapper.findElement(By.className("agenda-container"))
-                .findElements(By.tagName("div"));
+        List<WebElement> elementList_agendaDay = driver.findElements(By.className("agenda-day"));
+        List<WebElement> elementList_agendaEvent = driver.findElements(By.className("agenda-event__container"));
+        // Check to make sure two lists are equal
+        if (elementList_agendaDay.size() != elementList_agendaEvent.size()) {
+            System.out.println("TWO LISTS AREN'T EQUAL");
+            System.out.println("Day list: " + elementList_agendaDay.size());
+            System.out.println("Event list: " + elementList_agendaEvent.size());
+        }
+
+        // Get all agenda containers
+//        List<WebElement> assignmentLists = agendaWrapper.findElement(By.className("agenda-container"))
+//                .findElements(By.tagName("div"));
 
         /*
         Assignment lists should be a list of elements of agenda dates and content, alternating. Format on the page:
@@ -108,33 +114,23 @@ public class Window {
             <event container>
 
         Due dates with no assignments will not be shown or generated.
-
-        Format for agenda day:
-            <agenda day>
-                <agenda date>
-                    <span>Mon, Sep 11</span>
-
-        Format for agenda-event__container:
-            <agenda-event__container>
-                <ul agenda-event__list>
-                    <li agenda-event__item>
-                        <span class="screenreader-only">
-                            " Assignment, due {TIME DUE}, "
-                        <span class="screenreader-only">
-                            " {ASSIGNMENT NAME} "
-                        <span class="screenreader-only">
-                            " {Completed||Not Completed} "
-                        <span class="screenreader-only">Calendar {CLASS NAME} {CLASS ID}</span>
-                    <li agenda-event__item>
-                        {SAME STRUCTURE AS ABOVE}
-                    <li agenda-event__item>
-                        {SAME STRUCTURE AS ABOVE}
-                </ul>
          */
+
+        // Get every agendaDay we can and put them in the list
+        List<AgendaDay> agenda = new ArrayList<>(); // The entire agenda - each object is a due date with event containers
+        // Since everything comes in groups of two, iterate by 2s to skip over the second object each time
+        for (int i = 0; (i < elementList_agendaDay.size() && i < elementList_agendaEvent.size()); i++) {
+            // The list alternates between day and container, so the current i value will be the day and i+1 is the
+            //  container.
+            agenda.add(new AgendaDay(driver, elementList_agendaDay.get(i), elementList_agendaEvent.get(i)));
+        }
+
+        return agenda;
     }
 
     public void teardown() {
         if (driver != null) {
+            System.out.println("Shutting down browser with ID " + driver.getWindowHandle());
             driver.quit();
         }
     }

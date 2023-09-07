@@ -17,4 +17,5 @@ dependencies {
     implementation 'junit:junit:4.13.1'
     implementation 'org.seleniumhq.selenium:selenium-java:4.11.0'
     implementation("com.google.guava:guava:32.1.2-jre")
+    implementation 'org.jetbrains:annotations:20.1.0'
 }

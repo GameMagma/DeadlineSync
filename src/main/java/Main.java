@@ -1,10 +1,12 @@
 import java.util.HashMap;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String... args) {
         Scanner scanner = new Scanner(System.in);
         HashMap<String, String> schoolCredentials = new HashMap<>();
+        List<AgendaDay> agenda; // The list of assignments on Canvas
 
         System.out.print("Enter the username for your canvas account: ");
         String username = scanner.next();
@@ -41,10 +43,14 @@ public class Main {
 
         Window browser = new Window();
 
-        browser.setup(schoolCredentials);
-        System.out.println("Browser successfully set up.");
-        browser.getAssignments();
-
-        browser.teardown();
+        try {
+            browser.setup(schoolCredentials);
+            System.out.println("Browser successfully set up.");
+            agenda = browser.getAssignments();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            browser.teardown();
+        }
     }
 }
