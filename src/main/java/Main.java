@@ -4,10 +4,10 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String... args) {
-        Scanner scanner = new Scanner(System.in);
-        HashMap<String, String> schoolCredentials = new HashMap<>();
-        List<AgendaDay> agenda; // The list of assignments on Canvas
+        Scanner scanner = new Scanner(System.in); // Input scanner
+        HashMap<String, String> schoolCredentials = new HashMap<>(); // The user's login credentials for Canvas
 
+        // Get user's credentials
         System.out.print("Enter the username for your canvas account: ");
         String username = scanner.next();
 
@@ -41,12 +41,12 @@ public class Main {
         schoolCredentials.put("username", username);
         schoolCredentials.put("password", password);
 
-        Window browser = new Window();
+        Window browser = new Window(); // The browser window being used to get the assignments and due dates
 
         try {
             browser.setup(schoolCredentials);
             System.out.println("Browser successfully set up.");
-            agenda = browser.getAssignments();
+            List<AgendaDay> agenda = browser.getAssignments(); // List of Assignments on Canvas
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

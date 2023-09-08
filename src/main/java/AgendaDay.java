@@ -8,13 +8,23 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class AgendaDay {
-    private final WebDriver driver;          // The Web Driver
     private Date date;                       // Due date
     private List<Assignment> assignmentList; // List of assignments
 
+    /**
+     * Constructs the object and breaks down the agenda-day and agenda-event__container elements. Process:
+     * Go into the day element and parse for the date. Then, translate it to the current date using the parser from
+     * {@link SimpleDateFormat} and adding on the timezone and year using {@link Calendar} and {@link TimeZone}. Then
+     * go into the element_EventContainer element and get the list of event items. Create an {@link Assignment}
+     * object with each event item.
+     *
+     * @param driver The web driver.
+     * @param element_agendaDay The web element holding the due date of the given assignments
+     * @param element_EventContainer The event container web element holding the list of assignments
+     * @see Assignment
+     */
     public AgendaDay(@NotNull WebDriver driver,
                      @NotNull WebElement element_agendaDay, @NotNull WebElement element_EventContainer) {
-        this.driver = driver;
         this.assignmentList = new ArrayList<>(); // Initializes it so we can add assignments to it later
 
         /*
@@ -77,7 +87,7 @@ public class AgendaDay {
             // Take each event item, convert them into a usable assignment object, and add it to the assignment list
             for (WebElement eventItem :
                     agendaEventItems) {
-                assignmentList.add(new Assignment(driver, eventItem));
+                assignmentList.add(new Assignment(eventItem));
             }
         } catch (ParseException e) {
             System.out.println("Error parsing the given date string. Stack Trace:");
@@ -90,6 +100,21 @@ public class AgendaDay {
             this.date = null;
             this.assignmentList = null;
         }
+    }
+
+    /**
+     * @return The date of this Agenda Day. All assignments in the Assignment list will be due on this date.
+     * @see Assignment
+     */
+    public Date getDate() {
+        return date;
+    }
+
+    /**
+     * @return The list of every {@link Assignment} due on this day.
+     */
+    public List<Assignment> getAssignmentList() {
+        return assignmentList;
     }
 
     @Override

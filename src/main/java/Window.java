@@ -59,9 +59,15 @@ public class Window {
     }
 
     /**
-     * This method of getting assignments uses method 1, which is the more efficient option.
-     * This will go to the agenda in the calendar section, go through each day, and put each assignment in
-     * a list.
+     * This function gets all of the assignments that the user can see on Canvas.
+     * The process:
+     * Go to the agenda tab of the Calendar page, then go and grab all of the agenda-day and agenda-event__container
+     * elements to two separate lists (respectively). Then, it iterates through both lists simultaneously and adds
+     * creates an {@link AgendaDay} object with each agenda-day and agenda-event element. AgendaDay breaks the elements
+     * down into a usable format, so it can be easily sent to {@link CalendarManager}.
+     *
+     * @see AgendaDay
+     * @see Assignment
      */
     public List<AgendaDay> getAssignments() {
         // Switch to the calendar
@@ -86,7 +92,9 @@ public class Window {
 
         List<WebElement> elementList_agendaDay = driver.findElements(By.className("agenda-day"));
         List<WebElement> elementList_agendaEvent = driver.findElements(By.className("agenda-event__container"));
-        // Check to make sure two lists are equal
+
+        // Check to make sure two lists are equal. This should never fail, as every agenda-day element should have a
+        // respective agenda-event__container element.
         if (elementList_agendaDay.size() != elementList_agendaEvent.size()) {
             System.out.println("TWO LISTS AREN'T EQUAL");
             System.out.println("Day list: " + elementList_agendaDay.size());
