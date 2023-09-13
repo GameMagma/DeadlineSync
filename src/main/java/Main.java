@@ -1,5 +1,4 @@
-import com.google.api.services.tasks.model.Task;
-
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
@@ -8,7 +7,7 @@ public class Main {
     public static void main(String... args) {
         Scanner scanner = new Scanner(System.in); // Input scanner
         HashMap<String, String> schoolCredentials = new HashMap<>(); // The user's login credentials for Canvas
-        List<AgendaDay> agenda;
+        List<AgendaDay> agenda = new ArrayList<>(); // Empty initialization
 
         // Get user's credentials
         System.out.print("Enter the username for your canvas account: ");
@@ -50,31 +49,42 @@ public class Main {
             browser.setup(schoolCredentials);
             System.out.println("Browser successfully set up.");
             agenda = browser.getAssignments(); // List of Assignments on Canvas
-
-
-            System.out.println("\n All assignments have been retrieved. Will now start matching to Task List.");
-            TaskListManager.getTaskList();
-
-            // Get all tasks that are on the task list. If it exists, remove it from the Assignment list.
-            for (int i = 0; i < agenda.size(); i++) { // For each due date
-                AgendaDay dueDate = agenda.get(i);
-                for (int t = 0; t < dueDate.getAssignmentList().size(); t++) { // For each Assignment due on that day
-
-                    // Try to find a matching task for the current assignment
-                    boolean taskExists = TaskListManager.doesTaskExist(dueDate.getDate(),
-                            dueDate.getAssignmentList().get(t).getAssignmentName());
-
-                    // If the task could not be found, it doesn't exist, so it needs to be on the list.
-                    // If it was found, we don't need to worry about it, so remove it from the assignment list.
-                    if (!taskExists) {
-
-                    }
-                }
-            }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             browser.teardown();
+        }
+
+        try {
+            System.out.println("\n All assignments have been retrieved. Will now start matching to Task List.");
+
+            TaskListManager.initializeTaskList(false);
+
+            // Get all tasks that are on the task list. If it exists, remove it from the Assignment list.
+            for (AgendaDay dueDate : agenda) { // For each due date
+                for (int t = 0; t < dueDate.getAssignmentList().size(); t++) { // For each Assignment due on that day
+                    TaskListManager.convertToRFC3339(dueDate.getDate());
+
+                    // If the task could not be found, it doesn't exist, so it needs to be on the list.
+                    // If it was found, we don't need to worry about it, so remove it from the assignment list.
+                    if (TaskListManager.doesTaskExist(
+                            dueDate.getDate(), dueDate.getAssignmentList().get(t).getAssignmentName()))
+                    {
+                        System.out.printf("Assignment %s (Class %s) exists. Removing it from the list.",
+                                dueDate.getAssignmentList().get(t).getAssignmentName(),
+                                dueDate.getAssignmentList().get(t).getClassName()); // Debugging
+                        dueDate.removeAssignment(t);
+                    }
+                }
+            }
+
+            System.out.printf("New assignment list: %s\n", agenda);
+
+
+            // Add tasks to task list
+        } catch (Exception e) {
+            System.out.println("EXCEPTION HAS BEEN THROWN:");
+            e.printStackTrace();
         }
     }
 }

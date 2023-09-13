@@ -117,6 +117,15 @@ public class AgendaDay {
         return assignmentList;
     }
 
+    /**
+     * Removes the assignment object at the given index.
+     *
+     * @param index Index of assignment to remove
+     */
+    public void removeAssignment(int index) {
+        assignmentList.remove(index);
+    }
+
     @Override
     public String toString() {
         return "AgendaDay{" +
